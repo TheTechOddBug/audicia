@@ -32,8 +32,16 @@ jobs:
         id: filter
         run: |
           if [ "${{ github.event_name }}" = "push" ]; then
-            # Compare only the pushed commit, not the full batch
-            BASE="HEAD~1"
+            # The branch tip before this push, so a push carrying several
+            # commits is judged by everything it brought. HEAD~1 sees only the
+            # last commit, which silently hides changes made in any earlier one.
+            BASE="${{ github.event.before }}"
+            if [ -z "$BASE" ] ||
+               [ "$BASE" = "0000000000000000000000000000000000000000" ] ||
+               ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
+              # New branch, or a history rewrite that dropped the old tip.
+              BASE="HEAD~1"
+            fi
           else
             # PR: compare against the base branch
             BASE="origin/${{ github.base_ref }}"

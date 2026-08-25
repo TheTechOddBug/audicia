@@ -22,7 +22,7 @@
     "github-slugger": "npm:github-slugger@^2.0",
     "he": "npm:he@^1.2.0",
     "katex": "npm:katex@^0.18.4",
-    "marked": "npm:marked@^18.0.5",
+    "marked": "npm:marked@^18.0.11",
     "marked-alert": "npm:marked-alert@^2.1.2",
     "marked-footnote": "npm:marked-footnote@^1.4.0",
     "marked-highlight": "npm:marked-highlight@^2.2.4",

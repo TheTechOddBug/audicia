@@ -64,6 +64,7 @@ export default define.page<typeof handler>(function Post(props) {
         />
       </Head>
       <style
+        // deno-lint-ignore react-no-danger
         dangerouslySetInnerHTML={{ __html: CSS }}
       />
       <main id="main" className="post-container">

@@ -35,6 +35,7 @@ export default define.page(function App({ Component, url, state, route }) {
           crossOrigin="anonymous"
         />
         <style
+          // deno-lint-ignore react-no-danger
           dangerouslySetInnerHTML={{
             __html: `
           @font-face {

@@ -38,10 +38,14 @@ export default define.page<typeof handler>(function DocsPage(props) {
         <meta property="og:type" content="article" />
         <meta property="og:title" content={`${doc.title} – Audicia Docs`} />
       </Head>
-      <style dangerouslySetInnerHTML={{ __html: CSS }} />
+      <style
+        // deno-lint-ignore react-no-danger
+        dangerouslySetInnerHTML={{ __html: CSS }}
+      />
       <script
         type="application/json"
         id="docs-search-index"
+        // deno-lint-ignore react-no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(searchIndex) }}
       />
       <script

@@ -102,14 +102,20 @@ Both use standard `healthz.Ping` checks. Ports are configurable via
 
 ## Audit Log (File Mode)
 
-| Value               | Type    | Default                               | Description                           |
-| ------------------- | ------- | ------------------------------------- | ------------------------------------- |
-| `auditLog.enabled`  | boolean | `false`                               | Enable mounting the audit log volume. |
-| `auditLog.hostPath` | string  | `/var/log/kubernetes/audit/audit.log` | Host path to the audit log file.      |
+| Value                     | Type    | Default                               | Description                                                                                                   |
+| ------------------------- | ------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `auditLog.enabled`        | boolean | `false`                               | Enable mounting the audit log volume.                                                                         |
+| `auditLog.hostPath`       | string  | `/var/log/kubernetes/audit/audit.log` | Host path to the audit log file.                                                                              |
+| `auditLog.seLinuxOptions` | object  | `{}`                                  | SELinux options merged into the container security context. Set `type: spc_t` on SELinux-enforcing platforms. |
 
 When enabled, mounts the host file as a read-only volume. Requires control plane
 scheduling (nodeSelector + tolerations) and typically `runAsUser: 0` for
 hostPath read access.
+
+On SELinux-enforcing platforms (OpenShift, RHEL), the audit log directory
+(`/var/log/audit/`) carries the `auditd_log_t` SELinux label, which blocks
+container access even when running as root. Set `auditLog.seLinuxOptions.type`
+to `spc_t` to grant the container read access.
 
 ## Webhook (Webhook Mode)
 
@@ -185,6 +191,25 @@ helm install audicia audicia/audicia-operator -n audicia-system --create-namespa
   --set auditLog.hostPath=/var/log/kubernetes/audit/audit.log \
   --set nodeSelector."node-role\.kubernetes\.io/control-plane"="" \
   --set tolerations[0].key=node-role.kubernetes.io/control-plane \
+  --set tolerations[0].effect=NoSchedule \
+  --set podSecurityContext.runAsUser=0 \
+  --set podSecurityContext.runAsNonRoot=false
+```
+
+## Example: File Mode on OpenShift / SELinux
+
+On OpenShift, the Kubernetes API server audit log is at
+`/var/log/kube-apiserver/audit.log` (not `/var/log/audit/audit.log`, which is
+the Linux auditd log). SELinux also blocks container access to audit
+directories, so add `auditLog.seLinuxOptions.type=spc_t`:
+
+```bash
+helm install audicia audicia/audicia-operator -n audicia-system --create-namespace \
+  --set auditLog.enabled=true \
+  --set auditLog.hostPath=/var/log/kube-apiserver/audit.log \
+  --set auditLog.seLinuxOptions.type=spc_t \
+  --set nodeSelector."node-role\.kubernetes\.io/infra"="" \
+  --set tolerations[0].key=node-role.kubernetes.io/infra \
   --set tolerations[0].effect=NoSchedule \
   --set podSecurityContext.runAsUser=0 \
   --set podSecurityContext.runAsNonRoot=false

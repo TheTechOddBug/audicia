@@ -1,4 +1,5 @@
 import { define } from "../utils.ts";
+import { beaconScript } from "../lib/beacon.ts";
 
 const SITE_NAME = "Audicia";
 const SITE_URL = "https://audicia.io";
@@ -7,7 +8,7 @@ const DEFAULT_TITLE =
 const DEFAULT_DESCRIPTION =
   "Audicia is a Kubernetes Operator that watches audit logs and generates least-privilege RBAC policies. Open source, operator-native, with built-in compliance scoring.";
 
-export default define.page(function App({ Component, url, state }) {
+export default define.page(function App({ Component, url, state, route }) {
   const title = state?.title || DEFAULT_TITLE;
   const description = state?.description || DEFAULT_DESCRIPTION;
   const canonicalUrl = `${SITE_URL}${url.pathname}`;
@@ -34,6 +35,7 @@ export default define.page(function App({ Component, url, state }) {
           crossOrigin="anonymous"
         />
         <style
+          // deno-lint-ignore react-no-danger
           dangerouslySetInnerHTML={{
             __html: `
           @font-face {
@@ -195,6 +197,12 @@ export default define.page(function App({ Component, url, state }) {
             </a>
           </div>
         </footer>
+        <script
+          // deno-lint-ignore react-no-danger
+          dangerouslySetInnerHTML={{
+            __html: beaconScript(route ?? url.pathname),
+          }}
+        />
       </body>
     </html>
   );

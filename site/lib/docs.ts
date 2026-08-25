@@ -92,6 +92,10 @@ export const DOCS_NAV: NavSection[] = [
       { slug: "crd-audiciasource", title: "AudiciaSource CRD" },
       { slug: "crd-audiciareport", title: "AudiciaReport CRD" },
       { slug: "crd-audiciapolicy", title: "AudiciaPolicy CRD" },
+      {
+        slug: "crd-audiciapolicyreport",
+        title: "AudiciaPolicyReport CRD (Deprecated)",
+      },
       { slug: "features", title: "Features" },
       { slug: "metrics", title: "Metrics" },
     ],
@@ -190,16 +194,19 @@ export async function getDoc(
 
     let filePath: string;
     let category: string | null;
+    let name: string;
 
     if (slugParts.length === 2) {
       // e.g. ["concepts", "architecture"]
       category = slugParts[0];
       if (category === "internal") return null;
-      filePath = join(DOCS_DIR, category, `${slugParts[1]}.md`);
+      name = slugParts[1];
+      filePath = join(DOCS_DIR, category, `${name}.md`);
     } else if (slugParts.length === 1) {
       // e.g. ["roadmap"]
       category = null;
-      filePath = join(DOCS_DIR, `${slugParts[0]}.md`);
+      name = slugParts[0];
+      filePath = join(DOCS_DIR, `${name}.md`);
     } else {
       return null;
     }
@@ -208,16 +215,14 @@ export async function getDoc(
 
     // Extract title from first # heading
     const titleMatch = /^#\s+([^\n]+)$/m.exec(text);
-    const title = titleMatch ? titleMatch[1].trim() : slugParts.at(-1);
+    const title = titleMatch ? titleMatch[1].trim() : name;
 
     const transformed = transformLinks(text, category);
 
-    const path = category
-      ? `/docs/${category}/${slugParts[1]}`
-      : `/docs/${slugParts[0]}`;
+    const path = category ? `/docs/${category}/${name}` : `/docs/${name}`;
 
     return {
-      slug: slugParts.at(-1),
+      slug: name,
       category,
       title,
       content: transformed,

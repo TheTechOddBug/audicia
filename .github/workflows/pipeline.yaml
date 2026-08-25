@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       operator: ${{ steps.filter.outputs.operator }}
+      site: ${{ steps.filter.outputs.site }}
     steps:
       - name: Check Out Repo
         uses: actions/checkout@v6
@@ -31,17 +32,36 @@ jobs:
         id: filter
         run: |
           if [ "${{ github.event_name }}" = "push" ]; then
-            # Compare only the pushed commit, not the full batch
-            BASE="HEAD~1"
+            # The branch tip before this push, so a push carrying several
+            # commits is judged by everything it brought. HEAD~1 sees only the
+            # last commit, which silently hides changes made in any earlier one.
+            BASE="${{ github.event.before }}"
+            if [ -z "$BASE" ] ||
+               [ "$BASE" = "0000000000000000000000000000000000000000" ] ||
+               ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
+              # New branch, or a history rewrite that dropped the old tip.
+              BASE="HEAD~1"
+            fi
           else
             # PR: compare against the base branch
             BASE="origin/${{ github.base_ref }}"
           fi
-          if git diff --name-only "$BASE" HEAD | grep -qE '^(operator/|deploy/helm/)'; then
+          CHANGED="$(git diff --name-only "$BASE" HEAD)"
+          if echo "$CHANGED" | grep -qE '^(operator/|deploy/helm/)'; then
             echo "operator=true" >> "$GITHUB_OUTPUT"
           else
             echo "operator=false" >> "$GITHUB_OUTPUT"
           fi
+          if echo "$CHANGED" | grep -qE '^site/'; then
+            echo "site=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "site=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  site-check:
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.site == 'true'
+    uses: ./.github/workflows/site-check.yaml
 
   lint-and-test:
     needs: [detect-changes]
@@ -59,7 +79,7 @@ jobs:
       environment: ${{ needs.determine-version.outputs.environment }}
 
   site-build-and-push:
-    needs: [determine-version, detect-changes, docker-build-and-push]
+    needs: [determine-version, detect-changes, site-check, docker-build-and-push]
     # Always run unless a prior required job actually failed or was cancelled.
     # Skipped operator jobs (no operator changes) are fine — the site must
     # rebuild on every push regardless.

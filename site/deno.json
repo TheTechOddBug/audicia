@@ -50,6 +50,6 @@
       "noscript",
       "template"
     ],
-    "types": ["vite/client", "./lib/types/material-web.d.ts"]
+    "types": ["vite/client"]
   }
 }

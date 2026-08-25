@@ -99,6 +99,23 @@ helm install audicia audicia/audicia-operator \
 > Note that some kube-apiserver configurations reset file permissions on
 > restart. If you choose this approach, verify the permissions persist after an
 > apiserver restart.
+>
+> **On OpenShift?** The Kubernetes API server audit log lives at
+> `/var/log/kube-apiserver/audit.log`, **not** `/var/log/audit/audit.log` (that
+> is the Linux auditd log, which contains syscall-level events Audicia cannot
+> parse). Additionally, SELinux blocks access to audit directories even when
+> running as root. Add `seLinuxOptions` to your values:
+>
+> ```yaml
+> auditLog:
+>   enabled: true
+>   hostPath: /var/log/kube-apiserver/audit.log
+>   seLinuxOptions:
+>     type: spc_t
+> ```
+>
+> See the [Helm Values Reference](../configuration/helm-values.md) for more
+> details.
 
 ### For Webhook Ingestion
 

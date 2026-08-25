@@ -7,18 +7,53 @@ Major.Minor, and CI auto-increments the patch on each release to `main`.
 
 ---
 
+## 0.5.2
+
+### Added
+
+- **`auditLog.seLinuxOptions` Helm value** – on SELinux-enforcing platforms
+  (OpenShift, RHEL) the audit log directory carries the `auditd_log_t` label,
+  which blocks container access even when running as root. Setting
+  `auditLog.seLinuxOptions.type: spc_t` grants the container read access. The
+  option is only applied when `auditLog.enabled` is true; existing deployments
+  are unaffected.
+
+---
+
+## 0.5.1
+
+### Changed
+
+- **CRD short names simplified** – removed `ap` and `ar` short names from
+  `AudiciaPolicy` and `AudiciaReport` CRDs to avoid collisions with other
+  projects (e.g. Istio's `AuthorizationPolicy` uses `ap`). Only `apolicy` and
+  `areport` remain – all existing documentation already used these.
+
+### Added
+
+- **`AudiciaPolicyReport` deprecated CRD reference** – added a reference page
+  for the old 0.4.x CRD with field tables and migration pointers, listed in the
+  site navigation and features page.
+
+### Fixed
+
+- **Site logging noise** – static asset requests (fonts, CSS, JS, favicon,
+  og-image) are no longer logged, reducing log volume while keeping page
+  requests and `charts.audicia.io` downloads visible.
+
+---
+
 ## 0.5.0
 
 ### Breaking
 
 - **CRD split: `AudiciaPolicyReport` → `AudiciaReport` + `AudiciaPolicy`** – the
   monolithic report CRD has been split into two purpose-built resources:
-  - `AudiciaReport` (`ar`, `areport`) – compliance scoring, observed rules,
-    drift analysis. This is the primary assessment resource.
-  - `AudiciaPolicy` (`ap`, `apolicy`) – suggested RBAC manifests with an
-    approval workflow. New policies start as `Pending`; when the operator
-    detects manifest changes on an approved policy, it transitions to
-    `Outdated`.
+  - `AudiciaReport` (`areport`) – compliance scoring, observed rules, drift
+    analysis. This is the primary assessment resource.
+  - `AudiciaPolicy` (`apolicy`) – suggested RBAC manifests with an approval
+    workflow. New policies start as `Pending`; when the operator detects
+    manifest changes on an approved policy, it transitions to `Outdated`.
   - **Migration:** delete the old CRD
     (`kubectl delete crd
     audiciapolicyreports.audicia.io`), upgrade the Helm

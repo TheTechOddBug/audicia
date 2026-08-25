@@ -1,3 +1,7 @@
+// The terminal block below renders inside a <pre>, where every {"\n"} and
+// {"  "} is literal output and {"{"} / {"}"} are braces the reader has to see.
+// Collapsing them into JSX text children would change what the terminal shows.
+// deno-lint-ignore-file jsx-curly-braces
 export default function Hero() {
   return (
     <section className="hero">

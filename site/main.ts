@@ -1,6 +1,7 @@
-import { App, staticFiles } from "fresh";
+import { App, HttpError, staticFiles } from "fresh";
 import { chartsMiddleware } from "./lib/chartsMiddleware.ts";
 import { loggingMiddleware } from "./lib/loggingMiddleware.ts";
+import type { State } from "./utils.ts";
 
 const notFoundHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -86,13 +87,13 @@ const notFoundHtml = `<!DOCTYPE html>
 </body>
 </html>`;
 
-export const app = new App()
+export const app = new App<State>()
   .use(loggingMiddleware)
   .use(chartsMiddleware)
   .use(staticFiles())
   .onError("*", (ctx) => {
     console.log(`Error: ${ctx.error}`);
-    if (ctx.error?.status === 404) {
+    if (ctx.error instanceof HttpError && ctx.error.status === 404) {
       return new Response(notFoundHtml, {
         status: 404,
         headers: { "content-type": "text/html; charset=utf-8" },

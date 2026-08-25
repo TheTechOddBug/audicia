@@ -1,0 +1,27 @@
+name: Site Check
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v6
+
+      # Kept in step with the version site/Dockerfile builds against, so a
+      # formatting or typing rule that differs between Deno releases fails
+      # here rather than inside the image build.
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.7.3"
+
+      - name: Check Site
+        working-directory: site
+        run: deno task check

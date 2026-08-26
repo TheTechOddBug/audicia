@@ -7,18 +7,15 @@
     "docker:pinDigests"
   ],
   "timezone": "Europe/Berlin",
-  "labels": [
-    "renovate",
-    "dependencies"
-  ],
+  "labels": ["renovate", "dependencies"],
+
   "prHourlyLimit": 0,
   "prConcurrentLimit": 0,
+
   "packageRules": [
     {
       "description": "Pinned by @deno/gfm, not by us. site/deno.json only lists these so that gfm's own imports resolve; gfm declares the ranges it needs and the build fails to resolve the import when ours no longer overlaps. Raise these together with the @deno/gfm version that asks for them.",
-      "matchFileNames": [
-        "site/deno.json"
-      ],
+      "matchFileNames": ["site/deno.json"],
       "matchPackageNames": [
         "katex",
         "marked",
@@ -34,119 +31,67 @@
     },
     {
       "description": "Group Go module updates",
-      "matchManagers": [
-        "gomod"
-      ],
-      "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "digest"
-      ],
+      "matchManagers": ["gomod"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
       "groupName": "go modules: non-breaking",
       "automerge": true
     },
     {
       "description": "Major Go module updates require manual review",
-      "matchManagers": [
-        "gomod"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
+      "matchManagers": ["gomod"],
+      "matchUpdateTypes": ["major"],
       "automerge": false,
-      "labels": [
-        "breaking-change",
-        "manual-review"
-      ]
+      "labels": ["breaking-change", "manual-review"]
     },
     {
       "description": "Group and auto-merge GitHub Actions updates",
-      "matchManagers": [
-        "github-actions"
-      ],
-      "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "digest"
-      ],
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
       "groupName": "github actions",
       "automerge": true
     },
     {
       "description": "Ignore our own operator image (tag set by CI at build time)",
-      "matchPackageNames": [
-        "felixnotka/audicia-operator"
-      ],
+      "matchPackageNames": ["felixnotka/audicia-operator"],
       "enabled": false
     },
     {
       "description": "Group and auto-merge Docker base image updates",
-      "matchManagers": [
-        "dockerfile"
-      ],
-      "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "digest"
-      ],
+      "matchManagers": ["dockerfile"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
       "groupName": "docker base images",
       "automerge": true
     },
     {
       "description": "Major Docker/Actions updates require manual review",
-      "matchManagers": [
-        "dockerfile",
-        "github-actions"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
+      "matchManagers": ["dockerfile", "github-actions"],
+      "matchUpdateTypes": ["major"],
       "automerge": false,
-      "labels": [
-        "breaking-change",
-        "manual-review"
-      ]
+      "labels": ["breaking-change", "manual-review"]
     },
     {
       "description": "Group and auto-merge site dependency updates",
-      "matchManagers": [
-        "custom.regex"
-      ],
-      "matchFileNames": [
-        "site/deno.json"
-      ],
-      "matchUpdateTypes": [
-        "minor",
-        "patch"
-      ],
+      "matchManagers": ["custom.regex"],
+      "matchFileNames": ["site/deno.json"],
+      "matchUpdateTypes": ["minor", "patch"],
       "groupName": "site dependencies: non-breaking",
       "automerge": true
     },
     {
       "description": "Major site dependency updates require manual review",
-      "matchManagers": [
-        "custom.regex"
-      ],
-      "matchFileNames": [
-        "site/deno.json"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
+      "matchManagers": ["custom.regex"],
+      "matchFileNames": ["site/deno.json"],
+      "matchUpdateTypes": ["major"],
       "automerge": false,
-      "labels": [
-        "breaking-change",
-        "manual-review"
-      ]
+      "labels": ["breaking-change", "manual-review"]
     }
   ],
+
   "customManagers": [
     {
       "customType": "regex",
       "description": "Deno npm dependencies in deno.json",
-      "fileMatch": [
-        "^site/deno\\.json$"
-      ],
+      "fileMatch": ["^site/deno\\.json$"],
       "matchStrings": [
         "\"npm:(?<depName>[^@]+)@\\^(?<currentValue>[^\"]+)\""
       ],
